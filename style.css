@@ -1,0 +1,36 @@
+span{
+    display: inline-block;
+}
+
+#calculator{
+    display: inline-block;
+    background-color: salmon;
+    border-style: solid;
+    border-width: 1px;
+    border-color: gray;
+    border-radius: 8px;
+    margin: 8px;
+}
+
+#display{
+    display: inline-block;
+    width: 284px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 36px;
+    line-height: 1em;
+    padding: 0.5em;
+    margin: 16px;
+    height: 1em;
+    background-color: lightgray;
+    text-align: right;
+}
+
+button{
+    display: inline-block;
+    height: 80px;
+    width: 80px;
+    margin: 4px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 24px;
+}
