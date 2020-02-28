@@ -1,6 +1,6 @@
 const keys = [
     {pos:[0,0],     id:'clear',     fn:'clear',     char:'C'},
-    {pos:[0,1],     id:'delete',    fn:'delete',    char:'\u232B'},
+    {pos:[0,1],     id:'backspace', fn:'backspace', char:'\u232B'},
     {pos:[1,0],     id:'7',         fn:'input'},
     {pos:[1,1],     id:'8',         fn:'input'},
     {pos:[1,2],     id:'9',         fn:'input'},
@@ -56,12 +56,21 @@ keys.forEach(function(key){
             case 'clear':
                 calcClear(e.target);
                 break;
-            case 'delete':
-                calcDelete(e.target);
+            case 'backspace':
+                calcBackspace(e.target);
                 break;
         }
     })
     cell.appendChild(button);
+})
+
+//TODO (KEYBOARD INPUT, MISSING ESC, BACKSPACE)
+document.addEventListener('keydown', function(e){
+    console.log([e.keyCode, e.key]);
+    const familiar_keys = '0123456789+-*/=\d';
+    if (-1 < familiar_keys.indexOf(e.key)){
+        console.log('key recognized');
+    }
 })
 
 function drawKeypad(node, n, m){
@@ -90,9 +99,35 @@ function calcClear(button){
     display.textContent = '';
 }
 
-function calcDelete(button){
+function calcBackspace(button){
     display.textContent = display.textContent.slice(0, display.textContent.length - 1);
 }
 
 //TODO
-function calcSolve(button){}
+function calcSolve(button){
+    parseInput(display.textContent);
+}
+
+function parseInput(string){
+    const char_array = string.split('');
+    const nums = '.01234567890';
+    const parsed_array = char_array.reduce(function(arr, char, i){
+        if (0 === arr.length) {
+            arr.push(char);
+            return arr;
+        }
+        if (-1 < nums.indexOf(char) && -1 < nums.indexOf(char_array[i - 1])){
+            arr[arr.length - 1] += char;        
+        } else {
+            arr.push(char);
+        }
+        console.log(arr);
+        return arr;
+    },[])
+    return parsed_array;
+}
+
+function calcAdd(){}
+function calcSubtract(){}
+function calcMultiply(){}
+function calcDivide(){}
