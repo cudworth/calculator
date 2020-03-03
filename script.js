@@ -1,22 +1,27 @@
+const add_char = '\u002B';
+const subtract_char = '\u2212'
+const multiply_char = '\u2715';
+const divide_char = '\u00F7';
+
 const keys = [
     {pos:[0,0],     id:'clear',     fn:'clear',     char:'C'},
     {pos:[0,1],     id:'backspace', fn:'backspace', char:'\u232B'},
     {pos:[1,0],     id:'7',         fn:'input'},
     {pos:[1,1],     id:'8',         fn:'input'},
     {pos:[1,2],     id:'9',         fn:'input'},
-    {pos:[1,3],     id:'divide',    fn:'input',     char:'\u00F7'},
+    {pos:[1,3],     id:'divide',    fn:'input',     char:divide_char},
     {pos:[2,0],     id:'4',         fn:'input'},
     {pos:[2,1],     id:'5',         fn:'input'},
     {pos:[2,2],     id:'6',         fn:'input'},
-    {pos:[2,3],     id:'multiply',  fn:'input',     char:'\u2715'},
+    {pos:[2,3],     id:'multiply',  fn:'input',     char:multiply_char},
     {pos:[3,0],     id:'1',         fn:'input'},
     {pos:[3,1],     id:'2',         fn:'input'},
     {pos:[3,2],     id:'3',         fn:'input'},
-    {pos:[3,3],     id:'minus',     fn:'input',     char:'\u2212'},
+    {pos:[3,3],     id:'minus',     fn:'input',     char:subtract_char},
     {pos:[4,0],     id:'0',         fn:'input'},
     {pos:[4,1],     id:'decimal',   fn:'input',     char:'\u002E'},
     {pos:[4,2],     id:'equals',    fn:'solve',     char:'\u003D'},
-    {pos:[4,3],     id:'plus',      fn:'input',     char:'\u002B'},
+    {pos:[4,3],     id:'plus',      fn:'input',     char:add_char},
 ]
 
 const key_rows = 5;
@@ -65,6 +70,10 @@ keys.forEach(function(key){
 })
 
 //TODO (KEYBOARD INPUT, MISSING ESC, BACKSPACE)
+//TODO Prevent operator input prior to numeral input
+//TODO Prevent sequential operator input
+//TODO Return error if operator is last item in string when solved
+
 document.addEventListener('keydown', function(e){
     console.log([e.keyCode, e.key]);
     const familiar_keys = '0123456789+-*/=\d';
@@ -95,17 +104,40 @@ function calcInput(button){
     display.textContent += button.textContent;
 }
 
-function calcClear(button){
+function calcClear(){
     display.textContent = '';
 }
 
-function calcBackspace(button){
+function calcBackspace(){
     display.textContent = display.textContent.slice(0, display.textContent.length - 1);
 }
 
-//TODO
-function calcSolve(button){
-    parseInput(display.textContent);
+function calcSolve(){
+    let index;
+    let array = parseInput(display.textContent);
+    console.log(array);
+
+    while (array.includes(multiply_char)){
+        index = array.findIndex((char) => char === multiply_char)
+        array = calcMultiply(array, index);
+    }
+
+    while (array.includes(divide_char)){
+        index = array.findIndex((char) => char === divide_char)
+        array = calcDivide(array, index);
+    }
+
+    while (array.includes(add_char)){
+        index = array.findIndex((char) => char === add_char)
+        array = calcAdd(array, index);
+    }
+
+    while (array.includes(subtract_char)){
+        index = array.findIndex((char) => char === subtract_char)
+        array = calcSubtract(array, index);
+    }
+    console.log(array);
+    display.textContent = array[0];
 }
 
 function parseInput(string){
@@ -121,13 +153,31 @@ function parseInput(string){
         } else {
             arr.push(char);
         }
-        console.log(arr);
         return arr;
     },[])
     return parsed_array;
 }
 
-function calcAdd(){}
-function calcSubtract(){}
-function calcMultiply(){}
-function calcDivide(){}
+function calcAdd(array, index){
+    const val = Number(array[index - 1]) + Number(array[index + 1]);
+    array.splice(index - 1, 3, val);
+    return array;
+}
+
+function calcSubtract(array, index){
+    const val = Number(array[index - 1]) - Number(array[index + 1]);
+    array.splice(index - 1, 3, val);
+    return array;
+}
+
+function calcMultiply(array, index){
+    const val = Number(array[index - 1]) * Number(array[index + 1]);
+    array.splice(index - 1, 3, val);
+    return array;
+}
+
+function calcDivide(array, index){
+    const val = Number(array[index - 1]) / Number(array[index + 1]);
+    array.splice(index - 1, 3, val);
+    return array;
+}
