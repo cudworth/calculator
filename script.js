@@ -72,6 +72,7 @@ keys.forEach(function(key){
 })
 
 //TODO (KEYBOARD INPUT, MISSING ESC, BACKSPACE)
+//TODO Implement implicit 0, so that leading negative numbers calc correctly
 
 document.addEventListener('keydown', function(e){
     console.log([e.keyCode, e.key]);
@@ -170,61 +171,61 @@ function parseInput(string){
     return return_arr;
 }
 
-function calcAdd(array, index){
-    const val = Number(array[index - 1]) + Number(array[index + 1]);
-    array.splice(index - 1, 3, val);
-    return array;
+function calcAdd(arr, index){
+    const val = Number(arr[index - 1]) + Number(arr[index + 1]);
+    arr.splice(index - 1, 3, val);
+    return arr;
 }
 
-function calcSubtract(array, index){
-    const val = Number(array[index - 1]) - Number(array[index + 1]);
-    array.splice(index - 1, 3, val);
-    return array;
+function calcSubtract(arr, index){
+    const val = Number(arr[index - 1]) - Number(arr[index + 1]);
+    arr.splice(index - 1, 3, val);
+    return arr;
 }
 
-function calcMultiply(array, index){
-    const val = Number(array[index - 1]) * Number(array[index + 1]);
-    array.splice(index - 1, 3, val);
-    return array;
+function calcMultiply(arr, index){
+    const val = Number(arr[index - 1]) * Number(arr[index + 1]);
+    arr.splice(index - 1, 3, val);
+    return arr;
 }
 
-function calcDivide(array, index){
-    const val = Number(array[index - 1]) / Number(array[index + 1]);
-    array.splice(index - 1, 3, val);
-    return array;
+function calcDivide(arr, index){
+    const val = Number(arr[index - 1]) / Number(arr[index + 1]);
+    arr.splice(index - 1, 3, val);
+    return arr;
 }
 
-function inputValidation(array){
+function inputValidation(arr){
 
 
-    if (-1 < opers.indexOf(array[0]) || -1 < opers.indexOf(array[array.length-1])){
+    if (-1 < opers.indexOf(arr[0]) || -1 < opers.indexOf(arr[arr.length-1])){
         console.log('MISSING OPERAND ERROR')
-        return array = ['ERR'];
+        return arr = ['ERR'];
     }
 
     let prev = '';
-    array.forEach(function(elem){
+    arr.forEach(function(elem){
         if (-1 < opers.indexOf(prev) && -1 < opers.indexOf(elem)){
             console.log('SEQUENTIAL OPERATORS ERROR');
-            return array = ['ERR'];
+            return arr = ['ERR'];
         }
         prev = elem;
     })
 
     let contains_decimal;
-    array.forEach(function(elem){
+    arr.forEach(function(elem){
         contains_decimal = false;
         elem_arr = elem.split('').forEach(function(char){
             if(!contains_decimal && char === decimal_char){
                 contains_decimal = true;
             } else if (contains_decimal && char === decimal_char){
                 console.log('MULTIPLE DECIMALS ERROR');
-                return array = ['ERR'];
+                return arr = ['ERR'];
             }
         })
     })
     
-    return array;
+    return arr;
 }
 
 function roundDecimal(num, digits){
