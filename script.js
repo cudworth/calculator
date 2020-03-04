@@ -2,6 +2,8 @@ const add_char = '\u002B';
 const subtract_char = '\u2212'
 const multiply_char = '\u2715';
 const divide_char = '\u00F7';
+const decimal_char = '\u002E';
+const opers = [add_char, subtract_char, multiply_char, divide_char];
 
 const keys = [
     {pos:[0,0],     id:'clear',     fn:'clear',     char:'C'},
@@ -19,7 +21,7 @@ const keys = [
     {pos:[3,2],     id:'3',         fn:'input'},
     {pos:[3,3],     id:'minus',     fn:'input',     char:subtract_char},
     {pos:[4,0],     id:'0',         fn:'input'},
-    {pos:[4,1],     id:'decimal',   fn:'input',     char:'\u002E'},
+    {pos:[4,1],     id:'decimal',   fn:'input',     char:decimal_char},
     {pos:[4,2],     id:'equals',    fn:'solve',     char:'\u003D'},
     {pos:[4,3],     id:'plus',      fn:'input',     char:add_char},
 ]
@@ -70,9 +72,6 @@ keys.forEach(function(key){
 })
 
 //TODO (KEYBOARD INPUT, MISSING ESC, BACKSPACE)
-//TODO Prevent operator input prior to numeral input
-//TODO Prevent sequential operator input
-//TODO Return error if operator is last item in string when solved
 
 document.addEventListener('keydown', function(e){
     console.log([e.keyCode, e.key]);
@@ -99,9 +98,8 @@ function drawKeypad(node, n, m){
     node.appendChild
 }
 
-function calcInput(button){
-    if (-1 < display.textContent.indexOf('.') && button.textContent === '.') return 0;
-    display.textContent += button.textContent;
+function calcInput(btn){
+    display.textContent += btn.textContent;
 }
 
 function calcClear(){
@@ -114,48 +112,62 @@ function calcBackspace(){
 
 function calcSolve(){
     let index;
-    let array = parseInput(display.textContent);
-    console.log(array);
+    let arr = parseInput(display.textContent);
 
-    while (array.includes(multiply_char)){
-        index = array.findIndex((char) => char === multiply_char)
-        array = calcMultiply(array, index);
+    arr = inputValidation(arr);
+
+    while (arr.includes(multiply_char)){
+        index = arr.findIndex((char) => char === multiply_char)
+        arr = calcMultiply(arr, index);
     }
 
-    while (array.includes(divide_char)){
-        index = array.findIndex((char) => char === divide_char)
-        array = calcDivide(array, index);
+    while (arr.includes(divide_char)){
+        index = arr.findIndex((char) => char === divide_char)
+        arr = calcDivide(arr, index);
     }
 
-    while (array.includes(add_char)){
-        index = array.findIndex((char) => char === add_char)
-        array = calcAdd(array, index);
+    while (arr.includes(add_char)){
+        index = arr.findIndex((char) => char === add_char)
+        arr = calcAdd(arr, index);
     }
 
-    while (array.includes(subtract_char)){
-        index = array.findIndex((char) => char === subtract_char)
-        array = calcSubtract(array, index);
+    while (arr.includes(subtract_char)){
+        index = arr.findIndex((char) => char === subtract_char)
+        arr = calcSubtract(arr, index);
     }
-    console.log(array);
-    display.textContent = array[0];
+
+    arr = [roundDecimal(arr[0], 8)];
+
+    display.textContent = arr[0];
 }
 
 function parseInput(string){
-    const char_array = string.split('');
+    const char_arr = string.split('');
     const nums = '.01234567890';
-    const parsed_array = char_array.reduce(function(arr, char, i){
+    let input_error = false;
+    
+    let return_arr = char_arr.reduce(function(arr, char, i){
+
         if (0 === arr.length) {
             arr.push(char);
             return arr;
         }
-        if (-1 < nums.indexOf(char) && -1 < nums.indexOf(char_array[i - 1])){
+
+        if (-1 < nums.indexOf(char) && -1 < nums.indexOf(char_arr[i - 1])){
             arr[arr.length - 1] += char;        
-        } else {
+        }else if (-1 < nums.indexOf(char) || -1 < opers.indexOf(char)) {
             arr.push(char);
+        } else {
+            input_error = true;
         }
+
         return arr;
+
     },[])
-    return parsed_array;
+
+    if (input_error) return_arr = ['ERR'];
+
+    return return_arr;
 }
 
 function calcAdd(array, index){
@@ -180,4 +192,44 @@ function calcDivide(array, index){
     const val = Number(array[index - 1]) / Number(array[index + 1]);
     array.splice(index - 1, 3, val);
     return array;
+}
+
+function inputValidation(array){
+
+
+    if (-1 < opers.indexOf(array[0]) || -1 < opers.indexOf(array[array.length-1])){
+        console.log('MISSING OPERAND ERROR')
+        return array = ['ERR'];
+    }
+
+    let prev = '';
+    array.forEach(function(elem){
+        if (-1 < opers.indexOf(prev) && -1 < opers.indexOf(elem)){
+            console.log('SEQUENTIAL OPERATORS ERROR');
+            return array = ['ERR'];
+        }
+        prev = elem;
+    })
+
+    let contains_decimal;
+    array.forEach(function(elem){
+        contains_decimal = false;
+        elem_arr = elem.split('').forEach(function(char){
+            if(!contains_decimal && char === decimal_char){
+                contains_decimal = true;
+            } else if (contains_decimal && char === decimal_char){
+                console.log('MULTIPLE DECIMALS ERROR');
+                return array = ['ERR'];
+            }
+        })
+    })
+    
+    return array;
+}
+
+function roundDecimal(num, digits){
+    if(0 < num % 1 && digits < num.toString().length) {
+        num = Math.round(num * 10 ** digits) / (10 ** digits);
+    }
+    return num;
 }
