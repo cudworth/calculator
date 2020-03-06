@@ -72,7 +72,6 @@ keys.forEach(function(key){
 })
 
 //TODO (KEYBOARD INPUT, MISSING ESC, BACKSPACE)
-//TODO Implement implicit 0, so that leading negative numbers calc correctly
 
 document.addEventListener('keydown', function(e){
     console.log([e.keyCode, e.key]);
@@ -144,7 +143,7 @@ function calcSolve(){
 
 function parseInput(string){
     const char_arr = string.split('');
-    const nums = '.01234567890';
+    const nums = '-.01234567890';
     let input_error = false;
     
     let return_arr = char_arr.reduce(function(arr, char, i){
@@ -197,7 +196,6 @@ function calcDivide(arr, index){
 
 function inputValidation(arr){
 
-
     if (-1 < opers.indexOf(arr[0]) || -1 < opers.indexOf(arr[arr.length-1])){
         console.log('MISSING OPERAND ERROR')
         return arr = ['ERR'];
@@ -224,12 +222,12 @@ function inputValidation(arr){
             }
         })
     })
-    
+ 
     return arr;
 }
 
 function roundDecimal(num, digits){
-    if(0 < num % 1 && digits < num.toString().length) {
+    if(0 < (num % 1) ^ 2 && digits < num.toString().length) {
         num = Math.round(num * 10 ** digits) / (10 ** digits);
     }
     return num;
