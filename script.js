@@ -5,29 +5,29 @@ const divide_char = '\u00F7';
 const decimal_char = '\u002E';
 const opers = [add_char, subtract_char, multiply_char, divide_char];
 
-const keys = [
-    {pos:[0,0],     id:'clear',     fn:'clear',     char:'C'},
-    {pos:[0,1],     id:'backspace', fn:'backspace', char:'\u232B'},
-    {pos:[1,0],     id:'7',         fn:'input'},
-    {pos:[1,1],     id:'8',         fn:'input'},
-    {pos:[1,2],     id:'9',         fn:'input'},
-    {pos:[1,3],     id:'divide',    fn:'input',     char:divide_char},
-    {pos:[2,0],     id:'4',         fn:'input'},
-    {pos:[2,1],     id:'5',         fn:'input'},
-    {pos:[2,2],     id:'6',         fn:'input'},
-    {pos:[2,3],     id:'multiply',  fn:'input',     char:multiply_char},
-    {pos:[3,0],     id:'1',         fn:'input'},
-    {pos:[3,1],     id:'2',         fn:'input'},
-    {pos:[3,2],     id:'3',         fn:'input'},
-    {pos:[3,3],     id:'minus',     fn:'input',     char:subtract_char},
-    {pos:[4,0],     id:'0',         fn:'input'},
-    {pos:[4,1],     id:'decimal',   fn:'input',     char:decimal_char},
-    {pos:[4,2],     id:'equals',    fn:'solve',     char:'\u003D'},
-    {pos:[4,3],     id:'plus',      fn:'input',     char:add_char},
-]
+const btns = [
+    {pos:[0,0],     id:'clear',     fn:'clear',     key_bind:'Delete',       char:'C'},
+    {pos:[0,1],     id:'backspace', fn:'backspace', key_bind:'Backspace',    char:'\u232B'},
+    {pos:[1,0],     id:'_7',        fn:'input',     key_bind:'7',            char:'7'},
+    {pos:[1,1],     id:'_8',        fn:'input',     key_bind:'8',            char:'8'},
+    {pos:[1,2],     id:'_9',        fn:'input',     key_bind:'9',            char:'9'},
+    {pos:[1,3],     id:'divide',    fn:'input',     key_bind:'/',            char:divide_char},
+    {pos:[2,0],     id:'_4',        fn:'input',     key_bind:'4',            char:'4'},
+    {pos:[2,1],     id:'_5',        fn:'input',     key_bind:'5',            char:'5'},
+    {pos:[2,2],     id:'_6',        fn:'input',     key_bind:'6',            char:'6'},
+    {pos:[2,3],     id:'multiply',  fn:'input',     key_bind:'*',            char:multiply_char},
+    {pos:[3,0],     id:'_1',        fn:'input',     key_bind:'1',            char:'1'},
+    {pos:[3,1],     id:'_2',        fn:'input',     key_bind:'2',            char:'2'},
+    {pos:[3,2],     id:'_3',        fn:'input',     key_bind:'3',            char:'3'},
+    {pos:[3,3],     id:'minus',     fn:'input',     key_bind:'-',            char:subtract_char},
+    {pos:[4,0],     id:'_0',        fn:'input',     key_bind:'0',            char:'0'},
+    {pos:[4,1],     id:'decimal',   fn:'input',     key_bind:'.',            char:decimal_char},
+    {pos:[4,2],     id:'equals',    fn:'solve',     key_bind:'=',            char:'\u003D'},
+    {pos:[4,3],     id:'plus',      fn:'input',     key_bind:'+',            char:add_char},
+];
 
-const key_rows = 5;
-const key_cols = 4;
+const btn_rows = 5;
+const btn_cols = 4;
 
 const body = document.querySelector('body');
 
@@ -37,23 +37,24 @@ calculator.id = 'calculator';
 const display = document.createElement('div');
 display.id = 'display';
 
-const keypad = document.createElement('div');
+const btnpad = document.createElement('div');
 
 calculator.appendChild(display);
-calculator.appendChild(keypad);
+calculator.appendChild(btnpad);
 
 body.appendChild(calculator);
 
-drawKeypad(keypad, key_rows, key_cols);
+drawKeypad(btnpad, btn_rows, btn_cols);
 
-keys.forEach(function(key){
-    const [i, j] = key.pos;
+btns.forEach(function(btn){
+    const [i, j] = btn.pos;
     let cell = document.querySelector(`#cell_${i}_${j}`);
     const button = document.createElement('button');
-    button.textContent = (key.char)? key.char: key.id;
-    button.function = key.fn;
+    button.id = btn.id;
+    button.textContent = btn.char;
+    button.setAttribute('function', btn.fn);
     button.addEventListener('click', function (e){
-        switch (e.target.function){
+        switch (e.target.getAttribute('function')){
             case 'input':
                 calcInput(e.target);
                 break;
@@ -71,14 +72,12 @@ keys.forEach(function(key){
     cell.appendChild(button);
 })
 
-//TODO (KEYBOARD INPUT, MISSING ESC, BACKSPACE)
-
 document.addEventListener('keydown', function(e){
-    console.log([e.keyCode, e.key]);
-    const familiar_keys = '0123456789+-*/=\d';
-    if (-1 < familiar_keys.indexOf(e.key)){
-        console.log('key recognized');
-    }
+    btns.forEach(function(btn) {
+        if (btn.key_bind === e.key){
+            document.querySelector(`#${btn.id}`).click();
+        }
+    })
 })
 
 function drawKeypad(node, n, m){
@@ -98,8 +97,8 @@ function drawKeypad(node, n, m){
     node.appendChild
 }
 
-function calcInput(btn){
-    display.textContent += btn.textContent;
+function calcInput(button){
+    display.textContent += button.textContent;
 }
 
 function calcClear(){
