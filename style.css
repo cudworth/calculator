@@ -23,6 +23,7 @@ span{
     height: 1em;
     background-color: lightgray;
     text-align: right;
+    overflow: hidden;
 }
 
 button{
